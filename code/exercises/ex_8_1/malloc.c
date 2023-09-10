@@ -210,6 +210,7 @@ void *mm_malloc(size_t size) {
   }
   // 找到满足大小的 block，分配这个 block
   _block_set_used(block_ptr);
+  _block_set_footer(block_ptr);
   size_t block_size = _block_get_size(block_ptr);
   if (block_size > alloc_size) {
     // 如果这个 block 大于需要的大小，分割这个 block
