@@ -16,7 +16,13 @@ extern int  printf(const char* s, ...);
 extern void panic(char *s);
 
 /* memory management */
-extern void *page_alloc(int npages);
-extern void page_free(void *p);
+// only malloc/free can use these functions, don't use them directly, or else the system will crash
+// extern void *page_alloc(int npages);
+// extern void page_free(void *p);
+
+/* memory alloc */
+extern void *mm_malloc(size_t size);
+extern void mm_free(void *ptr);
+
 
 #endif /* __OS_H__ */

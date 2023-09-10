@@ -6,6 +6,9 @@
  */
 extern void uart_init(void);
 extern void page_init(void);
+extern void page_test(void);
+extern void mm_init(void);
+extern void mm_test(void);
 
 void start_kernel(void)
 {
@@ -13,6 +16,10 @@ void start_kernel(void)
 	uart_puts("Hello, RVOS!\n");
 
 	page_init();
+	page_test();
+
+	mm_init();
+	mm_test();
 
 	while (1) {}; // stop here!
 }

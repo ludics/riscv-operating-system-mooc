@@ -9,6 +9,7 @@ SRCS_C = \
 	uart.c \
 	printf.c \
 	page.c \
+	malloc.c \
 
 OBJS = $(SRCS_ASM:.S=.o)
 OBJS += $(SRCS_C:.c=.o)

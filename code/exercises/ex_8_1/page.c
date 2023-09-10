@@ -185,5 +185,7 @@ void page_test()
 
 	void *p3 = page_alloc(4);
 	printf("p3 = 0x%x\n", p3);
+	page_free(p3);
+	page_free(p);
 }
 
