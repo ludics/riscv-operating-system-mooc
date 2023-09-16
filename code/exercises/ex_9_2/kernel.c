@@ -21,7 +21,12 @@ void start_kernel(void)
 
 	os_main();
 
-	schedule();
+	while (1) {
+		// uart_puts("OS: Activate next task\n");
+		schedule();
+		// uart_puts("OS: Back to OS\n");
+		// uart_puts("\n");
+	}
 
 	uart_puts("Would not go here!\n");
 	while (1) {}; // stop here!

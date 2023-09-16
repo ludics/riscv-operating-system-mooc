@@ -11,6 +11,8 @@ extern void switch_to(struct context *next);
  */
 uint8_t __attribute__((aligned(16))) task_stack[MAX_TASKS][STACK_SIZE];
 struct context ctx_tasks[MAX_TASKS];
+struct context ctx_os;
+
 uint8_t task_priorities[MAX_TASKS];
 
 #define TASK_EMPTY 0
@@ -36,11 +38,16 @@ static void w_mscratch(reg_t x)
 
 void sched_init()
 {
-	w_mscratch(0);
+	w_mscratch((reg_t) &ctx_os);
 	for (int i = 0; i < MAX_TASKS; i++) {
 		task_status[i] = TASK_EMPTY;
 		task_priorities[i] = 0xff;
 	}
+}
+
+void back_to_os()
+{
+	switch_to(&ctx_os);
 }
 
 /*
@@ -75,10 +82,8 @@ void schedule()
 		}
 	}
 	if (next_task_id == -1) {
-		panic("no task to run!\n");
-		return;
-	}
-	if (next_task_id == _current) {
+		printf("no schedulable task\n");
+		task_delay(10000);
 		return;
 	}
 	_current = next_task_id;
@@ -124,7 +129,7 @@ int task_create(void (*start_routin)(void* param), void* param, uint8_t priority
  */
 void task_exit(void) {
 	task_status[_current] = TASK_EXITED;
-	schedule();
+	back_to_os();
 }
 
 /*
@@ -135,7 +140,7 @@ void task_exit(void) {
 void task_yield()
 {
 	task_status[_current] = TASK_READY;
-	schedule();
+	back_to_os();
 }
 
 /*
