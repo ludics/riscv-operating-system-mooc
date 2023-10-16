@@ -39,7 +39,7 @@ reg_t trap_handler(reg_t epc, reg_t cause)
 			uart_puts("software interruption!\n");
 			break;
 		case 7:
-			uart_puts("timer interruption!\n");
+			//uart_puts("timer interruption!\n");
 			timer_handler();
 			break;
 		case 11:

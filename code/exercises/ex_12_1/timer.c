@@ -29,10 +29,30 @@ void timer_init()
 	w_mstatus(r_mstatus() | MSTATUS_MIE);
 }
 
+char time_buf[8] = {'0', '0', ':', '0', '0', ':', '0', '0'};
+char back_buf[8] = {'\b', '\b', '\b', '\b', '\b', '\b', '\b', '\b'};
+
+void timer_print()
+{
+	int sec = _tick % 60;
+	int min = (_tick / 60) % 60;
+	int hour = (_tick / 3600) % 24;
+	time_buf[7] = '0' + sec % 10;
+	time_buf[6] = '0' + sec / 10;
+	time_buf[4] = '0' + min % 10;
+	time_buf[3] = '0' + min / 10;
+	time_buf[1] = '0' + hour % 10;
+	time_buf[0] = '0' + hour / 10;
+	if (_tick != 0) {
+		printf("%s", back_buf);
+	}
+	printf("%s", time_buf);
+}
+
 void timer_handler() 
 {
+	timer_print();
 	_tick++;
-	printf("tick: %d\n", _tick);
-
+	//printf("tick: %d\n", _tick);
 	timer_load(TIMER_INTERVAL);
 }
