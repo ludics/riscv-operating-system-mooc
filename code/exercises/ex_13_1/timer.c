@@ -4,6 +4,7 @@ extern void schedule(void);
 
 /* interval ~= 1s */
 #define TIMER_INTERVAL CLINT_TIMEBASE_FREQ
+#define TIMER_INTERVAL_MS (TIMER_INTERVAL / 1000)
 
 static uint32_t _tick = 0;
 
@@ -22,7 +23,7 @@ void timer_init()
 	 * On reset, mtime is cleared to zero, but the mtimecmp registers 
 	 * are not reset. So we have to init the mtimecmp manually.
 	 */
-	timer_load(TIMER_INTERVAL);
+	timer_load(TIMER_INTERVAL_MS * 500);
 
 	/* enable machine-mode timer interrupts. */
 	w_mie(r_mie() | MIE_MTIE);
@@ -33,7 +34,7 @@ void timer_handler()
 	_tick++;
 	printf("tick: %d\n", _tick);
 
-	timer_load(TIMER_INTERVAL);
+	timer_load(TIMER_INTERVAL_MS * 1000);
 
 	schedule();
 }

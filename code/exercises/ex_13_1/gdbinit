@@ -1,0 +1,23 @@
+display/z $mscratch
+display/z $mepc
+display/z $mie
+display/z $mstatus
+display/z $mcause
+display/z $a0
+display/z $a1
+display/z $pc
+display/z $t5
+display/z $t6
+
+set disassemble-next-line on
+
+b _start
+b sched_init
+b os_main
+b trap_vector
+b trap_handler
+b schedule
+b switch_to
+
+target remote : 1234
+c

@@ -13,6 +13,17 @@ extern void trap_init(void);
 extern void plic_init(void);
 extern void timer_init(void);
 
+void os_schedule(void) {
+	// 内核调度
+	while (1) {
+		uart_puts("os_schedule: Activate next task\n");
+		int id = r_mhartid();
+		*(uint32_t*)CLINT_MSIP(id) = 1;
+		uart_puts("os_schedule: Back to OS\n");
+		task_delay(10000);
+	}
+}
+
 void start_kernel(void)
 {
 	uart_init();
