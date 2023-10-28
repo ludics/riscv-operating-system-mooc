@@ -32,6 +32,7 @@ uint32_t task_timeslice[MAX_TASKS];
  * _current is used to point to the context of current task
  */
 static int _current = -1;
+static int _cur_timeslice = 0;
 
 extern void os_schedule();
 
@@ -54,11 +55,7 @@ void sched_init()
 	}
 }
 
-/*
- * implment a simple cycle FIFO schedular
- */
-void schedule()
-{
+int find_next_task_id() {
 	// 先扫描获取最高优先级
 	int highest_priority = 0xff;
 	for (int i = 0; i < MAX_TASKS; i++) {
@@ -85,13 +82,34 @@ void schedule()
 			}
 		}
 	}
+	return next_task_id;
+}
+
+/*
+ * implment a simple cycle FIFO schedular
+ */
+void schedule()
+{
+	int next_task_id = find_next_task_id();
+	// 没有可调度的任务
 	if (next_task_id == -1) {
-		// 没有可调度的任务
 		printf("no schedulable task!\n");
 		switch_to(&ctx_os);
 	}
+	// 检查下个任务的优先级是否比当前任务高，如果高则切换
+	// 如果优先级相同，则检查当前任务的时间片是否用完
+	if (_current == -1 || task_status[_current] == TASK_EXITED) {
+		_current = next_task_id;
+		_cur_timeslice = 1;
+	} else if (task_priorities[next_task_id] < task_priorities[_current] ||
+			(task_priorities[next_task_id] == task_priorities[_current] &&
+			 task_timeslice[_current] <= _cur_timeslice )) {
+		_current = next_task_id;
+		_cur_timeslice = 1;
+	} else {
+		_cur_timeslice++;
+	}
 	// 切换到下一个任务
-	_current = next_task_id;
 	struct context *next = &(ctx_tasks[_current]);
 	task_status[_current] = TASK_RUNNING;
 	switch_to(next);

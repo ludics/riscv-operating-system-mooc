@@ -27,7 +27,7 @@ void user_task(void* param)
 {
 	int id = (int) param;
 	printf("Task %d: Created!\n", id);
-	int iter_cnt = id / 1000 + 5;
+	int iter_cnt = id / 1000 + 10;
 	while (1) {
 		printf("Task %d: Running...\n", id);
 		task_delay(DELAY);
@@ -44,13 +44,13 @@ void os_main(void)
 {
 	// task_create(user_task0, NULL, 255, 0);
 	// task_create(user_task1, NULL, 255, 0);
-	task_create(user_task, (void *)3000, 0, 0);
-	task_create(user_task, (void *)8003, 3, 0);
-	task_create(user_task, (void *)2005, 5, 0);
-	task_create(user_task, (void *)5000, 0, 0);
-	task_create(user_task, (void *)9004, 4, 0);
-	task_create(user_task, (void *)6001, 1, 0);
-	task_create(user_task, (void *)7002, 2, 0);
-	task_create(user_task, (void *)4000, 0, 0);
+	task_create(user_task, (void *)3000, 0, 2);
+	task_create(user_task, (void *)8003, 3, 2);
+	task_create(user_task, (void *)2003, 3, 3);
+	task_create(user_task, (void *)5000, 0, 3);
+	task_create(user_task, (void *)9003, 3, 4);
+	task_create(user_task, (void *)6001, 1, 3);
+	task_create(user_task, (void *)7001, 1, 2);
+	task_create(user_task, (void *)4000, 0, 4);
 }
 
