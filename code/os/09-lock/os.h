@@ -70,6 +70,15 @@ extern int plic_claim(void);
 extern void plic_complete(int irq);
 
 /* lock */
+struct spinlock{
+	int locked;
+	char *name;
+};
+
+extern void initlock(struct spinlock *lk, char *name);
+extern void acquire(struct spinlock *lk);
+extern void release(struct spinlock *lk);
+
 extern int spin_lock(void);
 extern int spin_unlock(void);
 

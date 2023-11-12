@@ -4,12 +4,17 @@
 
 #define USE_LOCK
 
+#ifdef USE_LOCK
+struct spinlock lock;
+#endif
+
 void user_task0(void)
 {
 	uart_puts("Task 0: Created!\n");
 	while (1) {
 #ifdef USE_LOCK
-		spin_lock();
+		// spin_lock();
+		acquire(&lock);
 #endif
 		uart_puts("Task 0: Begin ... \n");
 		for (int i = 0; i < 5; i++) {
@@ -18,7 +23,8 @@ void user_task0(void)
 		}
 		uart_puts("Task 0: End ... \n");
 #ifdef USE_LOCK
-		spin_unlock();
+		// spin_unlock();
+		release(&lock);
 #endif
 	}
 }
@@ -39,6 +45,9 @@ void user_task1(void)
 /* NOTICE: DON'T LOOP INFINITELY IN main() */
 void os_main(void)
 {
+#ifdef USE_LOCK
+	initlock(&lock, "test");
+#endif
 	task_create(user_task0);
 	task_create(user_task1);
 }
