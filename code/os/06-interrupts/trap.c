@@ -26,7 +26,7 @@ void external_interrupt_handler()
 	}
 }
 
-reg_t trap_handler(reg_t epc, reg_t cause)
+reg_t trap_handler(reg_t epc, reg_t cause, reg_t status, reg_t mie, reg_t mip)
 {
 	reg_t return_pc = epc;
 	reg_t cause_code = cause & 0xfff;
@@ -42,6 +42,7 @@ reg_t trap_handler(reg_t epc, reg_t cause)
 			break;
 		case 11:
 			uart_puts("external interruption!\n");
+			printf("cause = %x, status = %x, mie = %x, mip = %x\n", cause, status, mie, mip);
 			external_interrupt_handler();
 			break;
 		default:

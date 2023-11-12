@@ -99,4 +99,11 @@ static inline reg_t r_mcause()
 	return x;
 }
 
+static inline reg_t r_mip()
+{
+	reg_t x;
+	asm volatile("csrr %0, mip" : "=r" (x) );
+	return x;
+}
+
 #endif /* __RISCV_H__ */

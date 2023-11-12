@@ -110,6 +110,9 @@ trap_vector:
 	# call the C trap handler in trap.c
 	csrr	a0, mepc
 	csrr	a1, mcause
+	csrr	a2, mstatus
+	csrr	a3, mie
+	csrr	a4, mip
 	call	trap_handler
 
 	# trap_handler will return the return address via a0.

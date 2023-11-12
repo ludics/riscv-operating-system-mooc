@@ -66,6 +66,12 @@
 #define uart_read_reg(reg) (*(UART_REG(reg)))
 #define uart_write_reg(reg, v) (*(UART_REG(reg)) = (v))
 
+// the transmit output buffer
+#define UART_TX_BUF_SIZE 32
+char uart_tx_buf[UART_TX_BUF_SIZE];
+uint64_t uart_tx_w;	// write next to uart_tx_buf[uart_tx_w % UART_TX_BUF_SIZE]
+uint64_t uart_tx_r;	// read next from uart_tx_buf[uart_tx_r % UART_TX_BUF_SIZE]
+
 void uart_init()
 {
 	/* disable interrupts. */
@@ -108,12 +114,16 @@ void uart_init()
 	 */
 	uint8_t ier = uart_read_reg(IER);
 	uart_write_reg(IER, ier | (1 << 0));
+	// uart_write_reg(IER, ier | (1 << 0) | (1 << 1));
 }
 
 int uart_putc(char ch)
 {
+	// w_mstatus(r_mstatus() & ~MSTATUS_MIE);
 	while ((uart_read_reg(LSR) & LSR_TX_IDLE) == 0);
-	return uart_write_reg(THR, ch);
+	int ret = uart_write_reg(THR, ch);
+	// w_mstatus(r_mstatus() | MSTATUS_MIE);
+	return ret;
 }
 
 void uart_puts(char *s)
@@ -121,6 +131,31 @@ void uart_puts(char *s)
 	while (*s) {
 		uart_putc(*s++);
 	}
+}
+
+void uart_put_buf() {
+	while(1) {
+		if (uart_tx_w == uart_tx_r) {
+			return;
+		}
+		if ((uart_read_reg(LSR) & LSR_TX_IDLE) == 0) {
+			return;
+		}
+		int c = uart_tx_buf[uart_tx_r % UART_TX_BUF_SIZE];
+		uart_tx_r++;
+		uart_write_reg(THR, c);
+	}
+}
+
+void uart_putc_itr(char ch) {
+	// spin until TX buffer has room
+	if (uart_tx_w == uart_tx_r + UART_TX_BUF_SIZE) {
+		return;
+	}
+	// add ch to uart_tx_buf
+	uart_tx_buf[uart_tx_w % UART_TX_BUF_SIZE] = ch;
+	uart_tx_w++;
+	uart_put_buf();
 }
 
 int uart_getc(void)
@@ -142,8 +177,11 @@ void uart_isr(void)
 		if (c == -1) {
 			break;
 		} else {
+			// uart_putc('[');
 			uart_putc((char)c);
+			// uart_putc(']');
 			uart_putc('\n');
 		}
 	}
+	uart_put_buf();
 }

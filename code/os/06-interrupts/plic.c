@@ -60,7 +60,10 @@ void plic_init(void)
 int plic_claim(void)
 {
 	int hart = r_tp();
+	// print pending interrupts
+	printf("claim hart %d PLIC pending bef: %x", hart, *(uint32_t*)PLIC_PENDING(hart));
 	int irq = *(uint32_t*)PLIC_MCLAIM(hart);
+	printf("claim hart %d PLIC pending aft: %x\n", hart, *(uint32_t*)PLIC_PENDING(hart));
 	return irq;
 }
 
