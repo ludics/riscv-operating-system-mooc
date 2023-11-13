@@ -4,6 +4,7 @@
 #include "types.h"
 #include "riscv.h"
 #include "platform.h"
+#include "timer_structs/list.h"
 
 #include <stddef.h>
 #include <stdarg.h>
@@ -18,8 +19,18 @@ extern int  printf(const char* s, ...);
 extern void panic(char *s);
 
 /* memory management */
-extern void *page_alloc(int npages);
-extern void page_free(void *p);
+// only malloc/free can use these functions, don't use them directly, or else the system will crash
+// extern void *page_alloc(int npages);
+// extern void page_free(void *p);
+
+/* memory alloc */
+extern void *mm_malloc(size_t size);
+extern void mm_free(void *ptr);
+extern void mm_print_blocks();
+
+/* random */
+extern void srandx(uint32_t seed);
+extern uint32_t randx();
 
 /* task management */
 struct context {
@@ -61,9 +72,12 @@ struct context {
 	reg_t pc; // offset: 31 *4 = 124
 };
 
-extern int  task_create(void (*task)(void));
+extern int  task_create(void (*task)(void* param), void* param, uint8_t prio, uint32_t ts);
 extern void task_delay(volatile int count);
 extern void task_yield();
+extern void task_exit();
+extern void back_to_os();
+extern void task_sleep(uint32_t ticks);
 
 /* plic */
 extern int plic_claim(void);
@@ -74,12 +88,18 @@ extern int spin_lock(void);
 extern int spin_unlock(void);
 
 /* software timer */
-struct timer {
+typedef struct timer {
 	void (*func)(void *arg);
 	void *arg;
 	uint32_t timeout_tick;
-};
+} timer;
 extern struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
 extern void timer_delete(struct timer *timer);
+extern uint32_t get_ticks();
+
+extern struct timer *list_timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
+extern void list_timer_delete(struct timer *timer);
+extern void list_timer_check();
+
 
 #endif /* __OS_H__ */

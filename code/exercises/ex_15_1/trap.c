@@ -32,24 +32,24 @@ reg_t trap_handler(reg_t epc, reg_t cause)
 {
 	reg_t return_pc = epc;
 	reg_t cause_code = cause & 0xfff;
-	
+	int id;
 	if (cause & 0x80000000) {
 		/* Asynchronous trap - interrupt */
 		switch (cause_code) {
 		case 3:
-			uart_puts("software interruption!\n");
+			// uart_puts("software interruption!\n");
 			/*
 			 * acknowledge the software interrupt by clearing
-    			 * the MSIP bit in mip.
+			 * the MSIP bit in mip.
 			 */
-			int id = r_mhartid();
-    			*(uint32_t*)CLINT_MSIP(id) = 0;
+			id = r_mhartid();
+			*(uint32_t*)CLINT_MSIP(id) = 0;
 
 			schedule();
 
 			break;
 		case 7:
-			uart_puts("timer interruption!\n");
+			// uart_puts("timer interruption!\n");
 			timer_handler();
 			break;
 		case 11:

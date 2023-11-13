@@ -99,4 +99,25 @@ static inline reg_t r_mcause()
 	return x;
 }
 
+static inline reg_t r_cycle()
+{
+	reg_t x;
+	asm volatile("rdcycle %0" : "=r" (x) );
+	return x;
+}
+
+static inline reg_t r_mscratch()
+{
+	reg_t x;
+	asm volatile("csrr %0, mscratch" : "=r" (x));
+	return x;
+}
+
+static inline reg_t r_rdtime()
+{
+	reg_t x;
+	asm volatile("rdtime %0" : "=r" (x));
+	return x;
+}
+
 #endif /* __RISCV_H__ */

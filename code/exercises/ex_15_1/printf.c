@@ -63,6 +63,21 @@ static int _vsnprintf(char * out, size_t n, const char* s, va_list vl)
 				format = 0;
 				break;
 			}
+			case 'u': {
+				unsigned long num = longarg ? va_arg(vl, unsigned long) : va_arg(vl, unsigned int);
+				long digits = 1;
+				for (unsigned long nn = num; nn /= 10; digits++);
+				for (int i = digits-1; i >= 0; i--) {
+					if (out && pos + i < n) {
+						out[pos + i] = '0' + (num % 10);
+					}
+					num /= 10;
+				}
+				pos += digits;
+				longarg = 0;
+				format = 0;
+				break;
+			}
 			case 's': {
 				const char* s2 = va_arg(vl, const char*);
 				while (*s2) {
