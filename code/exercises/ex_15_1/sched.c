@@ -200,7 +200,7 @@ void task_wakeup(void *arg)
 void task_sleep(uint32_t ticks)
 {
 	task_status[_current] = TASK_SLEEPING;
-	struct timer *t = list_timer_create(task_wakeup, (void*)_current, ticks);
+	struct timer *t = timer_create(task_wakeup, (void*)_current, ticks);
 	if (NULL == t) {
 		printf("task_sleep: timer_create failed!\n");
 		return;
@@ -209,4 +209,3 @@ void task_sleep(uint32_t ticks)
 	int id = r_mhartid();
 	*(uint32_t*)CLINT_MSIP(id) = 1;
 }
-

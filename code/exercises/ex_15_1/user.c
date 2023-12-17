@@ -63,11 +63,17 @@ void user_task_test_array(void* param) {
 
 extern void test_list_benchmark();
 extern void test_array_benckmark();
+extern void test_skip_list_1();
+extern void test_skip_list_2();
+extern void test_skip_list_3();
+extern void test_skip_list_benchmark();
 
 void user_task_test_list(void* param) {
 	uart_puts("Task test list: Created!\n");
-	test_list_benchmark();
+	// test_list_benchmark();
 	// test_array_benckmark();
+	// test_skip_list_3();
+	test_skip_list_benchmark();
 	task_exit();
 }
 
@@ -104,17 +110,17 @@ void user_task0(void* param)
 {
 	uart_puts("Task 0: Created!\n");
 
-	struct timer *t1 = list_timer_create(timer_func, &person, 30);
+	struct timer *t1 = timer_create(timer_func, &person, 30);
 	if (NULL == t1) {
-		printf("list_timer_create() failed!\n");
+		printf("timer_create() failed!\n");
 	}
-	struct timer *t2 = list_timer_create(timer_func, &person, 50);
+	struct timer *t2 = timer_create(timer_func, &person, 50);
 	if (NULL == t2) {
-		printf("list_timer_create() failed!\n");
+		printf("timer_create() failed!\n");
 	}
-	struct timer *t3 = list_timer_create(timer_func, &person, 100);
+	struct timer *t3 = timer_create(timer_func, &person, 100);
 	if (NULL == t3) {
-		printf("list_timer_create() failed!\n");
+		printf("timer_create() failed!\n");
 	}
 	while (1) {
 		uart_puts("Task 0: Running... \n");
@@ -129,7 +135,7 @@ void user_task1(void* param)
 	while (1) {
 		uart_puts("Task 1: Running... \n");
 		// task_delay(DELAY);
-		task_sleep(4);
+		task_sleep(80);
 	}
 }
 

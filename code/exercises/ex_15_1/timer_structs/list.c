@@ -113,7 +113,7 @@ void list_delete(st_list *list, st_list_node *node) {
 	list->size--;
 }
 
-const uint32_t MAX_TIMER = 100000;
+static const uint32_t MAX_TIMER = 100000;
 
 void test_list_benchmark() {
 	// sort insert 10000 nodes, then pop front 10000 nodes

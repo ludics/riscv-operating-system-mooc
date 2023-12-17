@@ -20,7 +20,7 @@ void timer_load(int interval)
 	*(uint64_t*)CLINT_MTIMECMP(id) = *(uint64_t*)CLINT_MTIME + interval;
 }
 
-void timer_init()
+void simple_timer_init()
 {
 	struct timer *t = &(timer_list[0]);
 	for (int i = 0; i < MAX_TIMER; i++) {
@@ -39,7 +39,7 @@ void timer_init()
 	w_mie(r_mie() | MIE_MTIE);
 }
 
-struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout)
+struct timer *simple_timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout)
 {
 	/* TBD: params should be checked more, but now we just simplify this */
 	if (NULL == handler || 0 == timeout) {
@@ -70,7 +70,7 @@ struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeo
 	return t;
 }
 
-void timer_delete(struct timer *timer)
+void simple_timer_delete(struct timer *timer)
 {
 	spin_lock();
 
@@ -88,7 +88,7 @@ void timer_delete(struct timer *timer)
 }
 
 /* this routine should be called in interrupt context (interrupt is disabled) */
-static inline void timer_check()
+static inline void simple_timer_check()
 {
 	struct timer *t = &(timer_list[0]);
 	for (int i = 0; i < MAX_TIMER; i++) {
@@ -107,14 +107,77 @@ static inline void timer_check()
 	}
 }
 
+#define USE_SKIP_LIST_TIMER
+// #define USE_LIST_TIMER
+// #define USE_SIMPLE_TIMER
+
+extern void list_timer_init();
+extern void list_timer_check();
+extern struct timer *list_timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
+extern void list_timer_delete(struct timer *timer);
+
+extern void skip_list_timer_init();
+extern void skip_list_timer_check();
+extern timer *skip_list_timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
+extern void skip_list_timer_delete(struct timer *timer);
+
+
+void timer_init() {
+#ifdef USE_SKIP_LIST_TIMER
+	skip_list_timer_init();
+#endif
+#ifdef USE_LIST_TIMER
+	list_timer_init();
+#endif
+#ifdef USE_SIMPLE_TIMER
+	simple_timer_init();
+#endif
+}
+
+void timer_check() {
+#ifdef USE_SKIP_LIST_TIMER
+	skip_list_timer_check();
+#endif
+#ifdef USE_LIST_TIMER
+	list_timer_check();
+#endif
+#ifdef USE_SIMPLE_TIMER
+	simple_timer_check();
+#endif
+}
+
+struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout) {
+#ifdef USE_SKIP_LIST_TIMER
+	return skip_list_timer_create(handler, arg, timeout);
+#endif
+#ifdef USE_LIST_TIMER
+	return list_timer_create(handler, arg, timeout);
+#endif
+#ifdef USE_SIMPLE_TIMER
+	return simple_timer_create(handler, arg, timeout);
+#endif
+}
+
+void timer_delete(struct timer *timer) {
+#ifdef USE_SKIP_LIST_TIMER
+	skip_list_timer_delete(timer);
+#endif
+#ifdef USE_LIST_TIMER
+	list_timer_delete(timer);
+#endif
+#ifdef USE_SIMPLE_TIMER
+	simple_timer_delete(timer);
+#endif
+}
+
 void timer_handler() 
 {
 	_tick++;
-	if (_tick % 10 == 0) {
+	if (_tick % 100 == 0) {
 		printf("tick: %d\n", _tick);
 	}
 
-	list_timer_check();
+	timer_check();
 
 	timer_load(TIMER_INTERVAL_MS * 100);
 

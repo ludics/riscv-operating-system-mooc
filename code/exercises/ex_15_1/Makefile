@@ -20,6 +20,7 @@ SRCS_C = \
 	malloc.c \
 	xoshiro256ss.c \
 	timer_structs/list.c \
+	timer_structs/skip_list.c \
 
 OBJS = $(SRCS_ASM:.S=.o)
 OBJS += $(SRCS_C:.c=.o)

@@ -5,6 +5,7 @@
 #include "riscv.h"
 #include "platform.h"
 #include "timer_structs/list.h"
+#include "timer_structs/skip_list.h"
 
 #include <stddef.h>
 #include <stdarg.h>
@@ -96,10 +97,5 @@ typedef struct timer {
 extern struct timer *timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
 extern void timer_delete(struct timer *timer);
 extern uint32_t get_ticks();
-
-extern struct timer *list_timer_create(void (*handler)(void *arg), void *arg, uint32_t timeout);
-extern void list_timer_delete(struct timer *timer);
-extern void list_timer_check();
-
 
 #endif /* __OS_H__ */

@@ -12,7 +12,6 @@ extern void os_main(void);
 extern void trap_init(void);
 extern void plic_init(void);
 extern void timer_init(void);
-extern void list_timer_init(void);
 extern void mm_init(void);
 // extern void mm_test(void);
 
@@ -43,8 +42,7 @@ void start_kernel(void)
 
 	plic_init();
 
-	// timer_init();
-	list_timer_init();
+	timer_init();
 
 	sched_init();
 
